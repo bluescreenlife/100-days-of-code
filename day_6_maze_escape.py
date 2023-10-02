@@ -1,6 +1,10 @@
 '''solution to reeborg's world maze escape game:
-https://reeborg.ca/reeborg.html
-'''
+https://reeborg.ca/reeborg.html'''
+
+def turn_right():
+    turn_left()
+    turn_left()
+    turn_left()
 
 while not at_goal():
     while not right_is_clear():
