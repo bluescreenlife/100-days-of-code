@@ -1,6 +1,7 @@
 from replit import clear
 import random
 
+# list of 50 popular IG accounts
 data = [
     {
         'name': 'Instagram',
@@ -303,6 +304,7 @@ data = [
         'country': 'United States'
     }]
 
+# game art
 logo = """
     __  ___       __             
    / / / (_)___ _/ /_  ___  _____
@@ -315,6 +317,7 @@ logo = """
 /_____/\____/|__/|__/\___/_/     
 """
 
+# artwork for matchup
 vs = """
  _    __    
 | |  / /____
@@ -323,6 +326,7 @@ vs = """
 |___/____(_)
 """
 
+# class to create a random IG account object from list and assign attribute variables
 class Person:
     def __init__(self):
         # select a random person from data dictionary
@@ -342,7 +346,7 @@ class Person:
         # print all but follower count for 2nd person
         print(f"Name: {self.name}\nDescription: {self.description}\nCountry: {self.country}")
 
-
+# main function to run game
 def game():
     clear()
     points = 0
@@ -364,7 +368,8 @@ def game():
         game()
     else:
         print("\nSee you next time!")
-            
+
+# function to pair up two IG accounts and get user guess, assign point if correct            
 def matchup():
     person1 = Person()
     person2 = Person()
@@ -374,7 +379,6 @@ def matchup():
 
     clear()
         
-    # print("------------------------------------------------------------------")
     print("\nFirst account:\n")
     person1.print_full()
     print(vs)
@@ -391,7 +395,6 @@ def matchup():
     higher_lower_guess = input(f"\nDoes {person2.name} have higher or lower followers than {person1.name}?\nType higher or lower: ").lower()
     
     if higher_lower_guess == answer:
-        # print("------------------------------------------------------------------")
         clear()
         print("\nCorrect! You score 1 point.")
         return 1
