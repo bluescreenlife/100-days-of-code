@@ -144,7 +144,6 @@ class CoffeeMachine:
         else:
             print(f"\nSorry, order not accepted. Please check machine resources and try again.\n"
             "\n🤖 \"MAINTENANNNNNCE!!! ⚡bzzzrtbpt⚡\"")
-        
 
 if __name__ == "__main__":
     coffee_robot = CoffeeMachine()
