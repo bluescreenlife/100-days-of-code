@@ -45,7 +45,7 @@ while game_is_on:
         ball.change_dir("P1")
         player2_scoreboard.score += 1
         player2_scoreboard.update()
-        if player2_scoreboard.score == 10:
+        if player2_scoreboard.score == 11:
             game_is_on = False
             player2_scoreboard.game_over()
     
@@ -54,7 +54,7 @@ while game_is_on:
         ball.change_dir("P2")
         player1_scoreboard.score += 1
         player1_scoreboard.update()
-        if player1_scoreboard.score == 10:
+        if player1_scoreboard.score == 11:
             game_is_on = False
             player1_scoreboard.game_over()
 
