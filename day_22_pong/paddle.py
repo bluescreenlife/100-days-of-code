@@ -5,7 +5,7 @@ P2_START_POS = [(375, 20), (375, 0), (375, -20)]
 MOVEMENT_SPEED = 10
 
 class Paddle:
-    # create paddle for player1 and player 2
+    # create paddle for player
     def __init__(self, player):
         self.segments = []
         self.player = player

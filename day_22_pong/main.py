@@ -1,7 +1,11 @@
-from turtle import Turtle, Screen
+'''recreation of the classic Pong arcade game
+2 players - player 1 uses W & S for up and down; player 2 uses arrow up and arrow down
+10 points to win'''
+
+from turtle import Screen
 from paddle import Paddle
 from ball import Ball
-'''recreation of the classic Pong game'''
+from midline import Midline
 from scoreboard import ScoreBoard
 import time
 
@@ -16,9 +20,11 @@ screen.tracer(0)
 player1 = Paddle('P1')
 player2 = Paddle('P2')
 ball = Ball()
-scoreboard = ScoreBoard()
+player1_scoreboard = ScoreBoard(1, (-200, 265))
+player2_scoreboard = ScoreBoard(2, (200, 265))
+Midline()
 
-# listen for keypresses and call appropriate fns
+# listen for keypresses and call appropriate paddle movement functions
 screen.listen()
 screen.onkey(player1.up, 'w')
 screen.onkey(player1.down, 's')
@@ -30,19 +36,27 @@ game_is_on = True
 # main game loop
 while game_is_on:
     screen.update()
-    time.sleep(0.1)
+    time.sleep(0.05)
     ball.move()
 
-    # detect collision with walls, assign points, refresh scores
+    # detect scoring, assign points, refresh scores
     if ball.xcor() <= -400:
         ball.reset()
-        scoreboard.p2_score += 1
-        scoreboard.update()
+        ball.change_dir("P1")
+        player2_scoreboard.score += 1
+        player2_scoreboard.update()
+        if player2_scoreboard.score == 10:
+            game_is_on = False
+            player2_scoreboard.game_over()
     
     if ball.xcor() >= 400:
         ball.reset()
-        scoreboard.p1_score += 1
-        scoreboard.update()
+        ball.change_dir("P2")
+        player1_scoreboard.score += 1
+        player1_scoreboard.update()
+        if player1_scoreboard.score == 10:
+            game_is_on = False
+            player1_scoreboard.game_over()
 
     # detect collision with paddles, bounce toward other player side
     for segment in player1.segments:

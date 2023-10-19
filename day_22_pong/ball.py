@@ -18,7 +18,7 @@ class Ball(Turtle):
         self.setheading(self.towards(P1_SIDE, self.get_random_y()))
 
     def reset(self):
-        # place food object at random location within screen boundaries
+        # place ball at screen center and direct at new random direction
         self.goto(0, 0)
     
     def move(self):
