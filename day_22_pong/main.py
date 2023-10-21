@@ -1,6 +1,6 @@
 '''recreation of the classic Pong arcade game
 2 players - player 1 uses W & S for up and down; player 2 uses arrow up and arrow down
-10 points to win'''
+11 points to win'''
 
 from turtle import Screen
 from paddle import Paddle
