@@ -11,14 +11,19 @@ class ScoreBoard(Turtle):
         self.goto(0, 270)
         self.color('lime')
         self.score = 0
+        with open('data.txt', mode='r') as data:
+            self.high_score = int(data.read())
         self.update()
 
     def update(self):
         # for use when snake eats food, clear scoreboard and generate new with updated score
         self.clear()
-        self.write(f"SNAKEY SCORE: {self.score}", align = ALIGNMENT, font = FONT)
+        self.write(f"SNAKEY SCORE: {self.score} HIGH SCORE: {self.high_score}", align = ALIGNMENT, font = FONT)
 
-    def game_over(self):
-        # text to be displayed in center of screen when game ends
-        self.goto(0, 0)
-        self.write(f"GAME OVER", align = 'center', font = FONT)
+    def reset(self):
+        if self.score > self.high_score:
+            self.high_score = self.score
+            with open('data.txt', mode='w') as data:
+                data.write(f'{self.high_score}')
+        self.score = 0
+        self.update()
