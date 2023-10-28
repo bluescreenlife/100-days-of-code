@@ -4,7 +4,7 @@ import math
 PINK = "#e2979c"
 RED = "#e7305b"
 GREEN = "#9bdeac"
-YELLOW = "#0C356A"
+BLUE = "#0C356A"
 FONT_NAME = "Courier"
 WORK_MIN = 25
 SHORT_BREAK_MIN = 5
@@ -57,23 +57,23 @@ def count_down(count):
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Pomodoro Timer")
-window.config(padx=100, pady=100, bg=YELLOW)
-canvas = Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
+window.config(padx=100, pady=100, bg=BLUE)
+canvas = Canvas(width=200, height=224, bg=BLUE, highlightthickness=0)
 tomato_img = PhotoImage(file='./tomato.png')
 canvas.create_image(100, 112, image=tomato_img)
 timer_text = canvas.create_text(100, 130, text="00:00", fill='white', font=(FONT_NAME, 25, 'bold'))
 canvas.grid(column=1, row=1)
 
-label_title = Label(text='Timer', bg=YELLOW, fg=GREEN, font=(FONT_NAME, 35, 'bold'))
+label_title = Label(text='Timer', bg=BLUE, fg=GREEN, font=(FONT_NAME, 35, 'bold'))
 label_title.grid(column=1, row=0)
 
-label_checks = Label(text=' ', bg=YELLOW, fg=GREEN, font=(FONT_NAME, 35, 'bold'))
+label_checks = Label(text=' ', bg=BLUE, fg=GREEN, font=(FONT_NAME, 35, 'bold'))
 label_checks.grid(column=1, row=3)
 
-button_start = Button(text="Start", highlightthickness=0, highlightbackground=YELLOW, command=start_timer)
+button_start = Button(text="Start", highlightthickness=0, highlightbackground=BLUE, command=start_timer)
 button_start.grid(column=0, row=2)
 
-button_reset = Button(text="Reset", highlightthickness=0, highlightbackground=YELLOW, command=reset_timer)
+button_reset = Button(text="Reset", highlightthickness=0, highlightbackground=BLUE, command=reset_timer)
 button_reset.grid(column=2, row=2)
 
 window.mainloop()
