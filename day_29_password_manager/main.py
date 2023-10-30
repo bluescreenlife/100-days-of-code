@@ -43,6 +43,8 @@ def save():
 # ---------------------------- UI SETUP ------------------------------- #
 FONT = 'Helvetica'
 FONT_SIZE = 14
+ENTRY_WIDTH = 35
+BUTTON_WIDTH = 33
 
 window = Tk()
 window.title("MyPass")
@@ -64,22 +66,22 @@ label_password = Label(text="Password:", font=(FONT, FONT_SIZE))
 label_password.grid(column=0, row=3)
 
 # Entries
-entry_website = Entry(width=39)
+entry_website = Entry(width=ENTRY_WIDTH)
 entry_website.grid(column=1, row=1, columnspan=2, sticky=W)
 entry_website.focus()
 
-entry_email_username = Entry(width=39)
+entry_email_username = Entry(width=ENTRY_WIDTH)
 entry_email_username.grid(column=1, row=2, columnspan=2, sticky=W)
 entry_email_username.insert(0, 'andrewvanderleest@gmail.com')
 
-entry_password = Entry(width=21)
-entry_password.grid(column=1, row=3, sticky=W)
+entry_password = Entry(width=ENTRY_WIDTH)
+entry_password.grid(column=1, row=3, columnspan=2, sticky=W)
 
 # Buttons
-button_generate_password = Button(text="Generate Password", command=generate_password)
-button_generate_password.grid(column=2, row=3)
+button_generate_password = Button(text="Generate Password", width=BUTTON_WIDTH, command=generate_password)
+button_generate_password.grid(column=1, row=4, columnspan=2)
 
-button_add_password = Button(text="Add", width=36, command=save)
-button_add_password.grid(column=1, row=4, columnspan=2)
+button_add_password = Button(text="Add", width=BUTTON_WIDTH, command=save)
+button_add_password.grid(column=1, row=5, columnspan=2)
 
 window.mainloop()
