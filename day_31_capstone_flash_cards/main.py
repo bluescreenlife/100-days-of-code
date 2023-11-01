@@ -1,3 +1,8 @@
+'''Basic French-English flash card studying app
+5 seconds by default to guess card correctly (green check mark)
+Correct cards removed from pool, remainder stored in CSV for continued study
+on next program launch'''
+
 from tkinter import *
 import pandas
 from random import choice
@@ -23,7 +28,7 @@ def next_card():
     canvas.itemconfigure(image_card, image=image_cardfront)
     canvas.itemconfigure(card_title, text="French", fill='black')
     canvas.itemconfigure(card_text, text=current_card['French'], fill='black')
-    flip_timer = window.after(3000, func=flip_card)
+    flip_timer = window.after(TIME, func=flip_card)
 
 def flip_card():
     '''Reveals the back of the card with English translation.'''
@@ -44,6 +49,7 @@ def remove_card():
 BACKGROUND_COLOR = "#B1DDC6"
 FONT_LANGUAGE = ("Arial", 40, "italic")
 FONT_WORD = ("Arial", 60, "bold")
+TIME = 5000 # time in milliseconds to respond to flash card
 
 # window setup
 window = Tk()
@@ -51,7 +57,7 @@ window.title("Flashy")
 window.config(padx= 50, pady=50, background=BACKGROUND_COLOR)
 
 # call function to flip to English translation after 3 sec
-flip_timer = window.after(3000, func=flip_card)
+flip_timer = window.after(TIME, func=flip_card)
 
 # canvas setup
 canvas = Canvas(width=800, height=526, highlightthickness=0, background=BACKGROUND_COLOR)
