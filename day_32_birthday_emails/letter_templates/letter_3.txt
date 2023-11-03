@@ -1,7 +1,11 @@
 Dear [NAME],
 
-It's your birthday! Have a great day!
+It's your birthday! Woohoo! Have a great day!
 
-All my love,
+This email was sent using a Python program I designed that will automatically send you a birthday greeting each year.
+
+Unfortunately, it can't send a gift yet, I'll have to deliver that in person!
+
+I hope your day is perfect!
 
 [SENDER]

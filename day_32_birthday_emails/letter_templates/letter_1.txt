@@ -1,7 +1,11 @@
 Dear [NAME],
 
-Happy birthday!
+Happy birthday! All the best for the year!
 
-All the best for the year!
+This email was sent using a Python program I designed that will automatically send you a birthday greeting each year.
+
+Unfortunately, it can't send a gift yet, I'll have to deliver that in person!
+
+I hope you have a wonderful day!
 
 [SENDER]

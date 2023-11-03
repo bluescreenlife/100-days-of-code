@@ -37,7 +37,7 @@ def get_birthday_message(recipient_name):
     with open(random_template, 'r') as birthday_letter:
         birthday_letter_list = birthday_letter.readlines()
         birthday_letter_list[0] = birthday_letter_list[0].replace("[NAME]", recipient_name.title())
-        birthday_letter_list[6] = birthday_letter_list[6].replace("[SENDER]", SENDER_NAME)
+        birthday_letter_list[10] = birthday_letter_list[10].replace("[SENDER]", SENDER_NAME)
         letter_to_send = "".join(birthday_letter_list)
         print(f"Message to be sent:\n{letter_to_send}\n")
         return letter_to_send

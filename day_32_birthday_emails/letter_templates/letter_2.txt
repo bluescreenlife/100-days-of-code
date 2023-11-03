@@ -2,6 +2,10 @@ Hey [NAME],
 
 Happy birthday! Have a wonderful time today and eat lots of cake!
 
-Lots of love,
+This email was sent using a Python program I designed that will automatically send you a birthday greeting each year.
+
+Unfortunately, it can't send a gift yet, I'll have to deliver that in person!
+
+I hope you have a fantastic day!
 
 [SENDER]
