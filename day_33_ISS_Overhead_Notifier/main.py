@@ -4,8 +4,8 @@ import smtplib
 import time
 
 # coordinates for sunrise/sunset data and ISS location comparison
-MY_LAT = 44.977753
-MY_LONG = -93.265015
+MY_LAT = 40.7128
+MY_LONG = -74.006
 
 # SMTP data
 SENDER_EMAIL_ADDR ='youremail@gmail.com'
