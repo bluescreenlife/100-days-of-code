@@ -6,8 +6,8 @@ API_KEY = '69f04e4613056b159c2761a9d9e664d2'
 OWM_ENDPOINT = 'https://api.openweathermap.org/data/2.5/onecall'
 
 # weather location
-LOCAL_LAT = 44.977753
-LOCAL_LONG = -93.265015
+LOCAL_LAT = 40.712776
+LOCAL_LONG = -74.005974
 
 # mail api
 SENDER_EMAIL_ADDR ='youremail@gmail.com'
