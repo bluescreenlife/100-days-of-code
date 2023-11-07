@@ -1,11 +1,15 @@
 import requests
 import smtplib
+from datetime import datetime
+import time
 
-# weather api
-API_KEY = '69f04e4613056b159c2761a9d9e664d2'
+### ADJUST THE FOLLOWING VARIABLES ACCORDINGLY ###
+
+# weather api - retrieved from https://openweathermap.org/api
+API_KEY = 'yourkey'
 OWM_ENDPOINT = 'https://api.openweathermap.org/data/2.5/onecall'
 
-# weather location
+# weather location - retrieved from https://www.latlong.net/ - set to New York by default
 LOCAL_LAT = 40.712776
 LOCAL_LONG = -74.005974
 
@@ -14,32 +18,54 @@ SENDER_EMAIL_ADDR ='youremail@gmail.com'
 SENDER_PW ='yourkey'
 SENDER_SERVER = 'smtp.gmail.com'
 SENDER_PORT = 587
-SENDER_NAME = "John Doe"
+SENDER_NAME = "yourname"
 
-# new york by default, change to any preferred site, to be included in email
-LOCAL_WEATHER = 'https://weather.com/weather/today/l/bd5db745591af55a4a30fea48170c2cb8f88b9f253dd3a583cdd862941fd13c2'
+# change to any preferred site, to be included in email - set to new york by default
+LOCAL_WEATHER_URL = 'https://weather.com/weather/today/l/bd5db745591af55a4a30fea48170c2cb8f88b9f253dd3a583cdd862941fd13c2'
 
-will_rain = False
+def get_weather():
+    '''Checks local weather conditions for next 24hr, returns a list of any inclement weather that is forecasted.'''
+    inclement_weather = []
 
-weather_params = {
-    'lat': LOCAL_LAT,
-    'lon': LOCAL_LONG,
-    'exclude': 'current,minutely,daily',
-    'appid': API_KEY
-}
+    weather_params = {
+        'lat': LOCAL_LAT,
+        'lon': LOCAL_LONG,
+        'exclude': 'current,minutely,daily',
+        'appid': API_KEY
+    }
 
-# get weather forecast
-response = requests.get(url=OWM_ENDPOINT, params = weather_params)
-response.raise_for_status()
-weather_data = response.json()
+    response = requests.get(url=OWM_ENDPOINT, params = weather_params)
+    weather_data = response.json()
+    next_24hr_codes = [hour_dict['weather'][0]['id'] for hour_dict in weather_data['hourly'][:24]]
 
-next_12hr_codes = [hour_dict['weather'][0]['id'] for hour_dict in weather_data['hourly'][:12]]
+    # add any inclement weather to list
+    if any(200 <= code < 300 for code in next_24hr_codes):
+        inclement_weather.append("thunderstorm")
 
-# set will rain to true if it will rain in next 12 hours
-if any(code < 600 for code in next_12hr_codes):
-    will_rain = True
+    if any(300 <= code < 400 for code in next_24hr_codes):
+        inclement_weather.append("drizzle")
 
-def send_email():
+    if any(500 <= code < 600 for code in next_24hr_codes):
+        inclement_weather.append("rain")
+
+    if any(600 <= code < 700 for code in next_24hr_codes):
+        inclement_weather.append("snow")
+
+    print(f"24hr weather codes: {next_24hr_codes}")
+    print(f"Inclement weather to occur today:")
+    for condition in inclement_weather:
+        print(condition)
+
+    return inclement_weather
+
+
+def send_email(weather_list):
+    '''Sends an email reporting the given weather conditions.'''
+    message = "The following weather conditions are to occur within the next 24 hours:"
+    for condition in weather_list:
+        message = f"{message}\n{condition}"
+    message = message + f"\n\nFor more details, here is a link to your local weather report:\n{LOCAL_WEATHER_URL}"
+    
     '''Sends an email from user to recipients notifying of weather condition.'''
     with smtplib.SMTP(SENDER_SERVER, port=SENDER_PORT) as connection:
         connection.starttls()
@@ -47,9 +73,11 @@ def send_email():
         connection.sendmail(
             from_addr=SENDER_EMAIL_ADDR, 
             to_addrs=SENDER_EMAIL_ADDR, 
-            msg=f"Subject:Rain Forecasted Today\n\nThere is rain in the forecast today within the next 12 hours. For more
-            information, click here: {LOCAL_WEATHER}\n\nThis email was sent automatically using a program written by {SENDER_NAME}.
-            \nTo unsubscribe, just reply and let them know!")
-    
-if will_rain:
-    send_email()
+            msg=f"Subject:Inclement Weather Alert\n\n{message}\n\nThis email was sent automatically using a program written by {SENDER_NAME}."
+        )
+
+# check each hour if it's 7am - if true, check weather and send any inclement conditions via email
+if datetime.now().hour == 7:
+    if get_weather():
+        send_email(get_weather())
+    time.sleep(3600)
