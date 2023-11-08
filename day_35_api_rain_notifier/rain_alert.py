@@ -75,9 +75,16 @@ def send_email(weather_list):
             to_addrs=SENDER_EMAIL_ADDR, 
             msg=f"Subject:Inclement Weather Alert\n\n{message}\n\nThis email was sent automatically using a program written by {SENDER_NAME}."
         )
+    
+    print("\nEmail(s) successfully sent.")
 
 # check each hour if it's 7am - if true, check weather and send any inclement conditions via email
-if datetime.now().hour == 7:
-    if get_weather():
-        send_email(get_weather())
-    time.sleep(3600)
+if __name__ == "__main__":
+    while True:
+        if datetime.now().hour == 7:
+            print("Running 7AM check.")
+            if get_weather():
+                send_email(get_weather())
+        else:
+            print(f"Current hour: {datetime.now().hour}\nWeather check not run.\n")
+        time.sleep(3600)
