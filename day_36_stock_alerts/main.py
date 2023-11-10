@@ -100,4 +100,3 @@ if __name__ == "__main__":
         else:
             print(f"Hour: {datetime.now().hour}. Check not run.\n")
         time.sleep(3600)
-    
