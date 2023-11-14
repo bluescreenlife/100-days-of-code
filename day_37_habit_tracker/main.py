@@ -27,13 +27,13 @@ user_params = {
 # ------ graph creation ------ #
 graph_creation_endpoint = f"{pixela_endpoint}/{USERNAME}/graphs"
 
-graph_config = {
-    "id" : "graph1",
-    "name" : "Meditation Graph",
-    "unit" : "minute",
-    "type" : "int",
-    "color" : "sora"
-}
+# graph_config = {
+#     "id" : "graph1",
+#     "name" : "Meditation Graph",
+#     "unit" : "minute",
+#     "type" : "int",
+#     "color" : "sora"
+# }
 
 # requests.post(url=graph_creation_endpoint, json=graph_config, headers=headers)
 # print(response.text)
@@ -67,6 +67,14 @@ def delete_pixel():
     response = requests.delete(url=f"{meditation_graph}/{delete_pixel}", headers=headers)
     print(response.text)
 
+# ------ update graph ------ #
+
+# graph_config = {
+#     "unit" : "minutes"
+# }
+# response = requests.put(url=meditation_graph, json=graph_config, headers=headers)
+# response.raise_for_status()
+# print(response.text)
 
 # ------ main menu ------ #
 selection = int(input("What would you like to do?\n\n1. Add today's pixel\n2. Update a pixel\n3. Delete a pixel\n\nEnter a number: "))
