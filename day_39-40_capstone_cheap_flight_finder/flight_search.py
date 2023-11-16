@@ -11,17 +11,19 @@ class FlightSearch:
         self.TEQUILA_ENDPOINT = "https://api.tequila.kiwi.com/v2/search"
         self.TEQUILA_KEY = os.environ.get("TEQUILA_KEY")
         self.headers = {
-            # "Content-Type" : "application/json",
+            "Content-Type" : "application/json",
             "apikey" : self.TEQUILA_KEY
         }
         self.HOME_CITY = home_city
         self.CURRENCY = "USD"
 
         today_date = datetime.now()
-        one_year_date = today_date + timedelta(days=365)
+        one_year_date = today_date + timedelta(days=183)
+        one_month_date = today_date + timedelta(days=30)
 
         self.FROM_DATE = datetime.now().strftime("%d/%m/%Y")
         self.TO_DATE = one_year_date.strftime("%d/%m/%Y")
+        self.RETURN_TO_DATE = one_month_date.strftime("%d/%m/%Y")
 
     def search_flights(self, to_city: str, max_price: int):
         '''Searches for flight criteria, returns matching flights'''
@@ -31,8 +33,11 @@ class FlightSearch:
             "fly_to" : to_city,
             "date_from" : self.FROM_DATE,
             "date_to" : self.TO_DATE,
+            "return_to": self.RETURN_TO_DATE,
             "price_to" : max_price,
-            "curr" : self.CURRENCY
+            "curr" : self.CURRENCY,
+            "max_stopovers" : 0,
+            "ret_from_diff_city" : False
         }
 
         response = requests.get(url=self.TEQUILA_ENDPOINT, params=flight_criteria, headers=self.headers)
@@ -114,20 +119,56 @@ class FlightSearch:
             'VN': 'Vietnam Airlines',
             'OZ': 'Asiana Airlines',
             'KC': 'Air Astana',
+            'SY': 'Sun Country',
+            'N0': 'Norwegian Airlines',
+            'Z0': 'Zoom Air',
+            'W4': 'Wizz Air Malta',
+            'FI': 'Icelandair',
+            'OG': 'PLAY Airlines',
+            'TO': 'Transavia France',
+            'RK': 'Ryanair UK'
         }
 
+        matching_flights = []
+
         for flight in result["data"]:
-            if flight["availability"]["seats"] != "null":
+            if flight["availability"]["seats"] != "null" and flight["availability"]["seats"] != None:
                 departure = flight["local_departure"].split("T")
-                arrival = flight["local_arrival"]
                 departure_date = departure[0]
-                departure_time = departure[1]
+                departure_time = departure[1][:5]
+                arrival = flight["local_arrival"].split("T")
+                arrival_date = arrival[0]
+                arrival_time = arrival[1][:5]
                 price = flight["fare"]["adults"]
                 seats_available = flight["availability"]["seats"]
                 airline = airlines_dict[flight["airlines"][0]]
+                flight_no = flight["route"][0]["flight_no"]
+            
+                matching_flights.append(
+                    {
+                    "price": f"${price}",
+                    "departure": f"{departure_date} @ {departure_time}",
+                    "arrival": f"{arrival_date} @ {arrival_time}",
+                    "seats available": seats_available,
+                    "airline": airline,
+                    "flight number": flight_no
+                    }
+                )
+        
+        def custom_key(flight):
+            departure_date_string = flight['departure'].split(' @ ')[0]  # Extracting the date part
+            departure_date = datetime.strptime(departure_date_string, '%Y-%m-%d')
+            price = int(flight['price'].replace('$', ''))  # Extracting the price as an integer
+            return (price, departure_date)
 
-            print(f"Airline: {airline}\nDepart date: {departure_date}\nDepart time: {departure_time}\n"
-                  f"Arrival time: {arrival}\nPrice: {price}\nSeats available: {seats_available}")
+        # Sort the list of flights using the custom key function
+        matching_flights = sorted(matching_flights, key=custom_key)
+
+        # Print the sorted list of flights
+        for flight in matching_flights:
+            print(flight)
+
+        return matching_flights
 
 flight_finder = FlightSearch("MSP")
-flight_finder.search_flights("LAS", 50)
+flight_finder.search_flights("LAS", 400)
