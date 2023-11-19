@@ -7,17 +7,18 @@ load_dotenv()
 class DataManager:
     '''Manages data in Google Sheet.'''
     def __init__(self):
-        self.SHEETY_ENDPOINT = "https://api.sheety.co/414d405e70de57c54d4c1178cc937f5a/flightDeals/prices"
         self.SHEETY_FLIGHTS_AUTH = os.environ.get("SHEETY_FLIGHTS_AUTH")
 
         self.HEADERS = {
             "authorization" : self.SHEETY_FLIGHTS_AUTH
         }
-        self.SHEET_DATA = self.get_sheet_data()
+        self.SHEET_DATA = None
 
     def get_sheet_data(self):
         '''Retrieves data from Google Sheet.'''
-        response = requests.get(url=self.SHEETY_ENDPOINT, headers=self.HEADERS)
+        prices_post_endpoint = "https://api.sheety.co/414d405e70de57c54d4c1178cc937f5a/flightDeals/prices"
+
+        response = requests.get(url=prices_post_endpoint, headers=self.HEADERS)
         response.raise_for_status()
         self.SHEET_DATA = response.json()
         return self.SHEET_DATA
@@ -47,3 +48,29 @@ class DataManager:
 
         response = requests.put(url=endpoint, json=data, headers=self.HEADERS)
         response.raise_for_status()
+
+    def new_user_signup(self):
+        users_endpoint = "https://api.sheety.co/414d405e70de57c54d4c1178cc937f5a/flightDeals/users"
+
+        first_name = input("Welcome to Flight Club. We find the best flight deals and email you.\nWhat is your first name? ").title()
+        last_name = input("What is your last name? ").title()
+        email = input("What is your email address? ").lower()
+        confirm_email = input("Confirm your email address: ").lower()
+
+        if email == confirm_email:
+            print("Congrats, you're in the club!")
+
+        data = {
+            "users": {
+                "firstName": first_name,
+                "lastName": last_name,
+                "email": email
+            }
+        }
+
+        response = requests.post(url=users_endpoint, json=data, headers=self.HEADERS)
+        check = response.raise_for_status()
+        print(check)
+
+test = DataManager()
+test.new_user_signup()
