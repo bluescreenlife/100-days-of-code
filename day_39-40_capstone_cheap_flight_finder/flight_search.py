@@ -20,7 +20,7 @@ class FlightSearch:
         self.from_date = datetime.now().strftime("%d/%m/%Y")
         self.to_date = six_month_date.strftime("%d/%m/%Y")
 
-    def search_flights(self, to_city: str, max_price: int):
+    def search_flights(self, to_city: str, max_price: int, stop_overs = 0):
         '''Searches for flights to a city below a certian price, returns matching flight information.'''
         endpoint =  "https://api.tequila.kiwi.com/v2/search"
         
@@ -31,7 +31,7 @@ class FlightSearch:
             "date_to" : self.to_date,
             "price_to" : max_price,
             "curr" : "USD",
-            "max_stopovers" : 0,
+            "max_stopovers" : stop_overs,
             "one_for_city": 1,
             "ret_from_diff_city" : False,
             "nights_in_dst_from": 7,
@@ -54,19 +54,25 @@ class FlightSearch:
                 arrival = flight["local_arrival"].split("T")
                 arrival_date = arrival[0]
                 arrival_time = arrival[1][:5]
+                for _ in flight["route"]:
+                    if _["flyTo"] == self.home_city:
+                        return_date = _["local_departure"][:10]
                 price = flight["fare"]["adults"]
                 seats_available = flight["availability"]["seats"]
                 airline = flight["airlines"][0]
                 flight_no = flight["route"][0]["flight_no"]
+                num_stopovers = int((len(flight["route"]) / 2) - 1)
             
                 matching_flights.append(
                     {
                     "price": f"${price}",
                     "departure": f"{departure_date} @ {departure_time}",
                     "arrival": f"{arrival_date} @ {arrival_time}",
+                    "return date": return_date,
                     "seats available": seats_available,
                     "airline": airline,
-                    "flight number": flight_no
+                    "flight number": flight_no,
+                    "stopovers": num_stopovers
                     }
                 )
         

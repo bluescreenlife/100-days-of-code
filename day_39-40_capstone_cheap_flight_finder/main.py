@@ -1,4 +1,5 @@
-#This file will need to use the DataManager,FlightSearch, FlightData, NotificationManager classes to achieve the program requirements.
+'''Program that uses Kiwi Tequila flight search API and Sheety API for Google Sheets, to search for flight
+deals given cities and prices in the sheet, and notify users listed in the user tab when a cheap flight is found.'''
 from data_manager import DataManager
 from flight_search import FlightSearch
 from notification_manager import NotificationManager
@@ -13,7 +14,6 @@ notifier = NotificationManager()
 sheet_data = data_manager.get_sheet_data()
 
 flights_to_notify = []
-recipient = os.environ.get("GMAIL_ADDR")
 message = "Good news! Some cheap flights were found for your destination(s) today:\n\n"
 
 # check for any missing IATA codes, retrieve if necessary
@@ -37,9 +37,18 @@ for row in sheet_data["prices"]:
             print(flight)
         flight_dict = {"city": row["city"], "flights": cheap_flights}
         flights_to_notify.append(flight_dict)
+    else:
+        cheap_flights_stopovers = flight_finder.search_flights(row["iataCode"], row["lowestPrice"], stop_overs=2)
+        if cheap_flights_stopovers:
+            print(f"Cheap flights to {row['city']} with 1 stopover:")
+            for flight in cheap_flights_stopovers:
+                print(flight)
+            flight_dict = {"city": row["city"], "flights": cheap_flights_stopovers}
+            flights_to_notify.append(flight_dict)
 
 # if cheap flights found, send notification email to recipient(s) with flight info
 if flights_to_notify:
+    recipients = data_manager.get_emails()
     print("Sending notification email...")
     for dict in flights_to_notify:
         message += f"{dict['city']}:\n"
@@ -47,7 +56,8 @@ if flights_to_notify:
             for key, value in flight.items():
                 message += f"{key}: {value}\n"
         message += "-----------------------------\n"
-    notifier.send_message(recipient, message)
+    notifier.send_message(recipients, message)
     print("Email(s) successfully sent.")
+    print(f"Message:\n{message}")
 else:
     print("No cheap flights found. No notification sent.")

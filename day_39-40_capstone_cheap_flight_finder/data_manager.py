@@ -50,6 +50,7 @@ class DataManager:
         response.raise_for_status()
 
     def new_user_signup(self):
+        '''Adds a new user (recipient of flight deal alerts) to the Google Sheet.'''
         users_endpoint = "https://api.sheety.co/414d405e70de57c54d4c1178cc937f5a/flightDeals/users"
 
         first_name = input("Welcome to Flight Club. We find the best flight deals and email you.\nWhat is your first name? ").title()
@@ -61,7 +62,7 @@ class DataManager:
             print("Congrats, you're in the club!")
 
         data = {
-            "users": {
+            "user": {
                 "firstName": first_name,
                 "lastName": last_name,
                 "email": email
@@ -69,8 +70,15 @@ class DataManager:
         }
 
         response = requests.post(url=users_endpoint, json=data, headers=self.HEADERS)
-        check = response.raise_for_status()
-        print(check)
+        response.raise_for_status()
 
-test = DataManager()
-test.new_user_signup()
+    def get_emails(self):
+        '''Retrieves a list of email address from the users tab of the Google Sheet.'''
+        users_endpoint = "https://api.sheety.co/414d405e70de57c54d4c1178cc937f5a/flightDeals/users"
+
+        response = requests.get(url=users_endpoint, headers=self.HEADERS)
+        response.raise_for_status()
+        data = response.json()
+
+        emails = [user["email"] for user in data["users"]]
+        return emails
