@@ -40,20 +40,12 @@ for job_id in job_ids:
     job_link = job_element.find_element(By.TAG_NAME, "a")
     job_link.click()
 
-    # job_card = driver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__content--two-pane")
-    button = driver.find_element(By.CLASS_NAME, "jobs-save-button artdeco-button artdeco-button--3 artdeco-button--secondary")
-    button.click()
-
-# ------------------- 
-
-# for job in jobs:
-#     job_link = job.find_element(By.TAG_NAME, "a")
-#     job_link.click()
-
-#     job_card = driver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__content--two-pane")
-#     buttons = job_card.find_elements(By.TAG_NAME, "button")
-#     save_button = buttons[3]
-#     save_button.click()
-
-# for item in jobs:
-#     lob_link = item.find_element(By.TAG_NAME, "a")
+    buttons_element = driver.find_element(By.CLASS_NAME, "job-details-jobs-unified-top-card__content--two-pane")
+    buttons = buttons_element.find_elements(By.TAG_NAME, "button")
+    for button in buttons:
+        span_text = button.find_element(By.CSS_SELECTOR, "span.aria-hidden").text
+        if span_text == "Save":
+            button.click()
+    # apply_button = buttons[2]
+    # save_button = buttons[3]
+    # save_button.click()
