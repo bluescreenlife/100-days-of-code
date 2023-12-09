@@ -1,13 +1,21 @@
+'''Script to log into LinkedIn, and save all jobs from a job search'''
+'''May be modified later to easy-apply to such jobs'''
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+
+# complete before running script - search is for "python developer" by default
+LINKEDIN_EMAIL = ""
+LINKEDIN_PW = ""
+LINKEDIN_SEARCH = "https://www.linkedin.com/jobs/search/?currentJobId=3779195212&f_AL=true&f_E=1%2C2&geoId=103039849&keywords=python%20developer&location=Minneapolis%2C%20Minnesota%2C%20United%20States&origin=JOB_SEARCH_PAGE_SEARCH_BUTTON&refresh=true"
 
 # webdriver set up
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_experimental_option("detach", True)
 
 driver = webdriver.Chrome(options=chrome_options)
-driver.get("https://www.linkedin.com/jobs/search/?currentJobId=3773748741&f_AL=true&f_E=1%2C2&geoId=103039849&keywords=qa%20tester&location=Minneapolis%2C%20Minnesota%2C%20United%20States&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true")
+driver.get(LINKEDIN_SEARCH)
 
 # click sign in button
 sign_in_button = driver.find_element(By.XPATH, "/html/body/div[3]/a[1]")
@@ -15,10 +23,10 @@ sign_in_button.click()
 
 # enter credentials, sign in
 email_input = driver.find_element(By.XPATH, "/html/body/div/main/div[2]/div[1]/form/div[1]/input")
-email_input.send_keys("andrewvanderleest@gmail.com")
+email_input.send_keys(LINKEDIN_EMAIL)
 
 pw_input = driver.find_element(By.XPATH, "/html/body/div/main/div[2]/div[1]/form/div[2]/input")
-pw_input.send_keys("rjwY9cr&66rT")
+pw_input.send_keys(LINKEDIN_PW)
 
 signin_button = driver.find_element(By.XPATH, "/html/body/div/main/div[2]/div[1]/form/div[3]/button")
 signin_button.click()
