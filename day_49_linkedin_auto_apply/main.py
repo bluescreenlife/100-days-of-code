@@ -4,11 +4,15 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # complete before running script - search is for "python developer" by default
-LINKEDIN_EMAIL = ""
-LINKEDIN_PW = ""
-LINKEDIN_SEARCH = "https://www.linkedin.com/jobs/search/?currentJobId=3779195212&f_AL=true&f_E=1%2C2&geoId=103039849&keywords=python%20developer&location=Minneapolis%2C%20Minnesota%2C%20United%20States&origin=JOB_SEARCH_PAGE_SEARCH_BUTTON&refresh=true"
+LINKEDIN_EMAIL = os.environ.get("EMAIL")
+LINKEDIN_PW = os.environ.get("PW")
+LINKEDIN_SEARCH = "https://www.linkedin.com/jobs/search/?currentJobId=3768733926&f_AL=true&f_E=1%2C2&geoId=103039849&keywords=python%20developer&location=Minneapolis%2C%20Minnesota%2C%20United%20States&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true"
 
 # webdriver set up
 chrome_options = webdriver.ChromeOptions()
