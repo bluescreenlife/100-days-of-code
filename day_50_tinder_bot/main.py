@@ -61,7 +61,9 @@ time.sleep(2)
 fb_login_button = driver.find_element(By.ID, value='loginbutton')
 fb_login_button.click()
 
-driver.implicitly_wait(10)
+# seems to be a fail point here where Tinder recognizes bot and quits the browser
+
+driver.implicitly_wait(20)
 
 # switch back to main window
 driver.switch_to.window(base_window)
