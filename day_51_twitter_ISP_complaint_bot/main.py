@@ -1,9 +1,11 @@
-from distutils.command import upload
+'''Checks internet speeds, tweets at ISP provider if speeds are below promised speeds.'''
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 import os
 from dotenv import load_dotenv
@@ -14,73 +16,79 @@ X_USERNAME = os.environ.get("X_USERNAME")
 X_PW = os.environ.get("X_PW")
 
 # internet speed variables (1GBPS)
-PROMISED_DOWN = 800
-PROMISED_UP = 800
+PROMISED_DOWN = 1000
+PROMISED_UP = 1000
 CHROME_DRIVER_PATH = "/Users/andrew/Developer/chromedriver"
 
 class InternetSpeedXBot:
-    def __init__(self, up=PROMISED_UP, down=PROMISED_DOWN):
+    def __init__(self, promised_down=PROMISED_DOWN, promised_up=PROMISED_UP):
         '''Initialize webdriver and promised speeds to check.'''
         self.service = Service(CHROME_DRIVER_PATH)
-        self.driver = webdriver.Chrome(service=self.service)
-        self.down = up
-        self.up = down
+        self.options = webdriver.ChromeOptions()
+        self.options.add_experimental_option("detach", True)
+        self.options.add_argument('--no-sandbox')
+        self.options.add_argument('--disable-dev-shm-usage')
+        self.driver = webdriver.Chrome(service=self.service, options=self.options)
+        self.promised_down = promised_down
+        self.promised_up = promised_up
+        self.down = 0
+        self.up = 0
 
     def get_internet_speed(self):
         '''Runs speed test, returns download and upload speeds as ints.'''
         self.driver.get("https://fast.com/")
-        sleep(10)
+        sleep(20)
         download_speed = self.driver.find_element(By.XPATH, "//*[@id='speed-value']").text
+        self.down = int(download_speed)
         more_info_button = self.driver.find_element(By.XPATH, "//*[@id='show-more-details-link']")
         more_info_button.click()
-        sleep(10)
+        sleep(15)
         upload_speed = self.driver.find_element(By.XPATH, "//*[@id='upload-value']").text
-        self.driver.quit()
-        return int(download_speed), int(upload_speed)
+        self.up = int(upload_speed)
 
-    def tweet_at_provider(self, download_speed, upload_speed):
+    def tweet_at_provider(self):
         '''Tweets at USI given a download and upload speed to report.'''
         self.driver.get("https://twitter.com/")
-        sleep(5)
 
         # sign in steps
-        sign_in = self.driver.find_element(By.XPATH, "//*[@id='react-root']/div/div/div[2]/main/div/div/div[1]/div/div/div[3]/div[5]/a/div")
+        sign_in = WebDriverWait(self.driver, 11.2).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[@id='react-root']/div/div/div[2]/main/div/div/div[1]/div/div/div[3]/div[5]/a/div")))
         sign_in.click()
-        sleep(5)
-        email_input = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input")
-        email_input.send_keys(X_USERNAME)
-        sleep(5)
-        next_button = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]")
-        next_button.click()
+        
         sleep(10)
-        pw_input = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input")
+
+        # fail point here apparently when site detects bot
+
+        email_input = WebDriverWait(self.driver, 7.6).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input")))
+        email_input.send_keys(X_USERNAME)
+        email_input.send_keys(Keys.ENTER)
+
+        pw_input = WebDriverWait(self.driver, 7.1).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input")))
         pw_input.send_keys(X_PW)
-        sleep(5)
-        log_in = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[2]/div/div[1]/div/div/div/div/span/span")
-        log_in.click()
-        sleep(35)
+        pw_input.send_keys(Keys.ENTER)
 
         # tweet steps - non functioning as it seems that X forces browser to quit after a bot login...
-        tweet_button = self.driver.find_element(By.XPATH, "//*[@id='react-root']/div/div/div[2]/header/div/div/div/div[1]/div[3]/a")
+        tweet_button = WebDriverWait(self.driver, 19.5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='react-root']/div/div/div[2]/header/div/div/div/div[1]/div[3]/a")))
         tweet_button.click()
-        sleep(2)
-        tweet_box = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[1]/div[2]/div/div/div/div/div/div/div/div/div/div/div/label/div[1]/div/div/div/div/div/div[2]/div/div/div/div")
-        tweet_box.send_keys(f"Hey @usifiber, my advertised speed is 1GBPS down/1GBPS up and I'm receiving {download_speed}MBPS down/"
-                            f"{upload_speed}MBPS up. This tweet was automated via a Python script.")
-        sleep(2)
-        post_button = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[2]/div[2]/div/div/div/div[4]/div/span")
-        post_button.click()
 
+        tweet_box = WebDriverWait(self.driver, 5.1).until(EC.presence_of_element_located((By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[1]/div[2]/div/div/div/div/div/div/div/div/div/div/div/label/div[1]/div/div/div/div/div/div[2]/div/div/div/div")))
+        tweet_box.send_keys(f"Hey @usifiber, my advertised speed is {PROMISED_DOWN}MBPS down/{PROMISED_UP}MBPS up and I'm receiving {self.down}MBPS down/"
+                            f"{self.up}MBPS up. This tweet was automated via a Python script.")
+
+        post_button = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[2]/div[2]/div/div/div/div[4]/div/span")
+        # post_button.click() # disabled for testing
 
 if __name__ == "__main__":
     bot = InternetSpeedXBot()
     print("Running speed test...")
-    down, up = bot.get_internet_speed()
-    print(f"Download speed: {down} | Upload speed: {up}")
-    sleep(20) # seems to be an issue with opening another driver instance soon after another
-    if down < PROMISED_DOWN or up < PROMISED_UP:
+    bot.get_internet_speed()
+    print(f"Download speed: {bot.down} | Upload speed: {bot.up}")
+    sleep(5)
+    if bot.down < bot.promised_down or bot.up < bot.promised_up:
         print("Speeds lower than promised... tweeting at USI...")
-        bot.tweet_at_provider(download_speed=down, upload_speed=up) # X does not like bot logins - forces quit after login
+        bot.tweet_at_provider() # X does not like bot logins - forces quit after login
         print("Tweet successful.")
     else:
         print("Speeds are within promised range.")
