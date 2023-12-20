@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 import os
 from dotenv import load_dotenv
@@ -18,7 +19,7 @@ X_PW = os.environ.get("X_PW")
 # internet speed variables (1GBPS)
 PROMISED_DOWN = 1000
 PROMISED_UP = 1000
-CHROME_DRIVER_PATH = "/Users/andrew/Developer/chromedriver"
+CHROME_DRIVER_PATH = ChromeDriverManager().install()
 
 class InternetSpeedXBot:
     def __init__(self, promised_down=PROMISED_DOWN, promised_up=PROMISED_UP):
@@ -28,6 +29,7 @@ class InternetSpeedXBot:
         self.options.add_experimental_option("detach", True)
         self.options.add_argument('--no-sandbox')
         self.options.add_argument('--disable-dev-shm-usage')
+        # self.options.add_argument("--headless") # enable/disable headless mode
         self.driver = webdriver.Chrome(service=self.service, options=self.options)
         self.promised_down = promised_down
         self.promised_up = promised_up
@@ -55,9 +57,7 @@ class InternetSpeedXBot:
             (By.XPATH, "//*[@id='react-root']/div/div/div[2]/main/div/div/div[1]/div/div/div[3]/div[5]/a/div")))
         sign_in.click()
         
-        sleep(10)
-
-        # fail point here apparently when site detects bot
+        sleep(5)
 
         email_input = WebDriverWait(self.driver, 7.6).until(EC.presence_of_element_located(
             (By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input")))
@@ -69,16 +69,26 @@ class InternetSpeedXBot:
         pw_input.send_keys(X_PW)
         pw_input.send_keys(Keys.ENTER)
 
-        # tweet steps - non functioning as it seems that X forces browser to quit after a bot login...
-        tweet_button = WebDriverWait(self.driver, 19.5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='react-root']/div/div/div[2]/header/div/div/div/div[1]/div[3]/a")))
+        # tweet steps
+        tweet_button = WebDriverWait(self.driver, 30.5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='react-root']/div/div/div[2]/header/div/div/div/div[1]/div[3]/a")))
         tweet_button.click()
 
         tweet_box = WebDriverWait(self.driver, 5.1).until(EC.presence_of_element_located((By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[1]/div[2]/div/div/div/div/div/div/div/div/div/div/div/label/div[1]/div/div/div/div/div/div[2]/div/div/div/div")))
         tweet_box.send_keys(f"Hey @usifiber, my advertised speed is {PROMISED_DOWN}MBPS down/{PROMISED_UP}MBPS up and I'm receiving {self.down}MBPS down/"
                             f"{self.up}MBPS up. This tweet was automated via a Python script.")
 
-        post_button = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[2]/div[2]/div/div/div/div[4]/div/span")
-        # post_button.click() # disabled for testing
+        try:
+            post_button = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[2]/div[2]/div/div/div/div[4]/div/span")
+            post_button.click()
+        except ElementClickInterceptedException:
+            try:
+                boost_security_dismiss = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[3]/div/div/div/div/div/div[2]/div[2]/div/div[1]/div/div/div/div[1]/div/div/svg")
+                boost_security_dismiss.click()
+            except NoSuchElementException:
+                unlock_more_dismiss = self.driver.find_element(By.XPATH, "//*[@id='layers']/div[2]/div/div/div/div/div/div[2]/div[2]/div/div[1]/div/div/div/div[1]/div/div/svg")
+                unlock_more_dismiss.click()
+                
+        self.driver.close()
 
 if __name__ == "__main__":
     bot = InternetSpeedXBot()
