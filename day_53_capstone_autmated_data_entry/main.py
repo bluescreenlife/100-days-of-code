@@ -1,15 +1,12 @@
 '''Automated data entry project: Scrapes apartment listings from Zillow
-and fills out a Google Sheet with addresses, rent prices, and links.
+and fills out a Google Sheet with addresses, rent prices, and links.'''
 
-Undiagnosed issue with webdriver, runs fine in headless mode, but
-quits after 10-15 sheet entries in normal mode, disconnects from devtools.'''
-
-from cgitb import text
 from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 
 # beautiful soup setup for scraping property listings
@@ -47,12 +44,12 @@ for property in properties:
 # webdriver setup for input to Google Sheet
 google_form_url = "https://docs.google.com/forms/d/e/1FAIpQLSeep00r5NguE17zhAvKleAcY0teBUuAszFWghMly216GMeiwQ/viewform?usp=sf_link"
 
-chromedriver_path = "/Users/andrew/Developer/chromedriver"
+chromedriver_path = ChromeDriverManager().install()
 
 service = Service(executable_path=chromedriver_path)
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_experimental_option("detach", True)
-chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--headless") # enable for headless operation
 driver = webdriver.Chrome(options=chrome_options, service=service)
 
 # input each property's data into Google Sheet
