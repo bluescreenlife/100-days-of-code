@@ -1,7 +1,7 @@
 '''Logs into an Instagram account, gets follower list of another account, and follows as many as possible.
 Current viewable follower list for any account is 50 accounts, therefore this is the max this program can follow.
 
-Instagram now seems to have an invisible overlay element over the followers element 
+Instagram currently seems to have an invisible overlay element over the followers element 
 to prevent bot clicks = this program is not currently operational for this reason.'''
 
 from selenium import webdriver
