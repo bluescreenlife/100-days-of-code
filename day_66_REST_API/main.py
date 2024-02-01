@@ -2,6 +2,8 @@ import json
 from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+# from sqlalchemy.exc import NoResultFound
+# from werkzeug.exceptions import NotFound
 from sqlalchemy import Integer, String, Boolean
 import random
 
@@ -40,6 +42,8 @@ with app.app_context():
 @app.route("/")
 def home():
     return render_template("index.html")
+
+# HTTP GET - Read Record
 
 @app.route("/random")
 def get_random_cafe():
@@ -85,6 +89,9 @@ def search():
     else:
         return jsonify(error={"Not Found": "Sorry, a cafe was not found at that location."})
     
+
+# HTTP POST - Create Record
+
 @app.route("/add", methods=["POST"])
 def add_new_cafe():
     new_cafe = Cafe(
@@ -104,14 +111,34 @@ def add_new_cafe():
     db.session.commit()
     return jsonify(response={"success": "Successfully added the cafe."})
 
-# HTTP GET - Read Record
 
-# HTTP POST - Create Record
 
 # HTTP PUT/PATCH - Update Record
 
+@app.route("/update-price/<cafe_id>", methods=["PATCH"])
+def update_price(cafe_id):
+    cafe_to_update = db.session.get(Cafe, cafe_id)
+    if cafe_to_update:
+        cafe_to_update.coffee_price = request.args.get("new_coffee_price")
+        db.session.commit()
+        return jsonify(response={"success": "Successfully updated the price."}), 200
+    else:
+        return jsonify(error={"Not Found": "Sorry, a cafe with that id was not found in the database."}), 404
+
 # HTTP DELETE - Delete Record
 
-
+@app.route("/report-closed/<cafe_id>", methods=["DELETE"])
+def delete_cafe(cafe_id):
+    if request.args.get("api-key") == "TopSecretAPIKey":
+        cafe_to_delete = db.session.get(Cafe, cafe_id)
+        if cafe_to_delete:
+            db.session.delete(cafe_to_delete)
+            db.session.commit()
+            return jsonify(response={"success": "Successfully deleted the cafe."}), 200
+        else:
+            return jsonify(error={"Not Found": "Sorry, a cafe with that id was not found in the database."}), 404
+    else:
+        return jsonify(error={"Authetication Error": "Sorry, the API key provided is not valid."}), 401
+    
 if __name__ == '__main__':
     app.run(debug=True)
