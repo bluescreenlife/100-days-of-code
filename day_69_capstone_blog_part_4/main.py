@@ -1,5 +1,4 @@
 from datetime import date
-from turtle import back
 from flask import Flask, abort, render_template, redirect, url_for, flash
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
@@ -12,23 +11,36 @@ from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import CommentForm, CreatePostForm, LoginForm, RegisterForm
 
+# configure Flask app, Bootstrap
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
-# Configure Flask-Login
+# configure Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# CREATE DATABASE
+# configure Gravatar
+gravatar = Gravatar(
+    app,
+    size=100,
+    rating='g',
+    default='retro',
+    force_default=False,
+    force_lower=False,
+    use_ssl=False,
+    base_url=None
+)
+
+# create database
 class Base(DeclarativeBase):
     pass
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
-# User table 
+# user table 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -38,7 +50,7 @@ class User(UserMixin, db.Model):
     posts = relationship("BlogPost", back_populates="author")
     comments = relationship("Comment", back_populates="comment_author")
 
-# blogpost table
+# blog post table
 class BlogPost(db.Model):
     __tablename__ = "blog_posts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -66,15 +78,19 @@ class Comment(db.Model):
 
     text: Mapped[str] = mapped_column(Text, nullable=False)
 
+# user loader callback
 @login_manager.user_loader
 def load_user(user_id):
     return db.get_or_404(User, user_id)
 
+# create database(s) if don't already exist
 with app.app_context():
     db.create_all()
 
 
-# hash the user's password when creating a new user.
+# -------------------- SITE ROUTES -------------------- #
+    
+# new user registration
 @app.route('/register', methods=["GET", "POST"])
 def register():
     form = RegisterForm()
@@ -102,7 +118,7 @@ def register():
     return render_template("register.html", form=form, logged_in=current_user.is_authenticated)
 
 
-# Retrieve a user from the database based on their email. 
+# user login, with password hashing
 @app.route('/login', methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -138,7 +154,7 @@ def get_all_posts():
 
     return render_template("index.html", all_posts=posts, logged_in=current_user.is_authenticated)
 
-
+# post view, with comment functionality
 @app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
@@ -178,7 +194,7 @@ def admin_only(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
+# new post creation - admin only 
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
 def add_new_post():
@@ -197,7 +213,7 @@ def add_new_post():
         return redirect(url_for("get_all_posts"))
     return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated)
 
-
+# edit post - admin only
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 @admin_only
 def edit_post(post_id):
@@ -219,7 +235,7 @@ def edit_post(post_id):
         return redirect(url_for("show_post", post_id=post.id))
     return render_template("make-post.html", form=edit_form, is_edit=True, logged_in=current_user.is_authenticated)
 
-
+# delete post - admin only
 @app.route("/delete/<int:post_id>")
 @admin_only
 def delete_post(post_id):

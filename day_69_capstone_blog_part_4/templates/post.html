@@ -45,10 +45,10 @@
           <ul class="commentList">
             <li>
               <div class="commenterImage">
-                <img src="../static/assets/img/default-profile.jpg" />
+                <img src="{{ comment.comment_author.email | gravatar }}" />
               </div>
               <div class="commentText">
-                {{ comment.text }}
+                {{ comment.text|safe }}
                 <span class="date sub-text">{{ comment.comment_author.name }}</span>
               </div>
             </li>
