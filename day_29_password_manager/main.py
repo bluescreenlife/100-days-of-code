@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Canvas, PhotoImage, Label, Entry, Button
 from tkinter import messagebox
 from random import choice, randint, shuffle
 import pyperclip
@@ -17,7 +17,7 @@ def generate_password():
 
     password = "".join(password_list)
 
-    entry_password.delete(0, END)
+    entry_password.delete(0, 'end')
     entry_password.insert(0, password)
     pyperclip.copy(password)
 
@@ -68,15 +68,15 @@ label_password.grid(column=0, row=3)
 
 # Entries
 entry_website = Entry(width=ENTRY_WIDTH)
-entry_website.grid(column=1, row=1, columnspan=2, sticky=W)
+entry_website.grid(column=1, row=1, columnspan=2, sticky='W')
 entry_website.focus()
 
 entry_email_username = Entry(width=ENTRY_WIDTH)
-entry_email_username.grid(column=1, row=2, columnspan=2, sticky=W)
+entry_email_username.grid(column=1, row=2, columnspan=2, sticky='W')
 entry_email_username.insert(0, 'andrewvanderleest@gmail.com')
 
 entry_password = Entry(width=ENTRY_WIDTH)
-entry_password.grid(column=1, row=3, columnspan=2, sticky=W)
+entry_password.grid(column=1, row=3, columnspan=2, sticky='W')
 
 # Buttons
 button_generate_password = Button(text="Generate Password", width=BUTTON_WIDTH, command=generate_password)
