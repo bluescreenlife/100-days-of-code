@@ -3,9 +3,16 @@ from tkinter import Tk, ttk, Canvas, filedialog
 from PIL import Image, ImageTk
 
 image_to_mark = None # to be assigned PhotoImage object
+image_preview = None # reference for preview pane image
+
 watermark = None # to be assigned PhotoImage object
+watermark_preview = None # reference for preview pane watermark
+
 preview_size = (400, 400)
-image_preview = None
+watermark_preview_size = tuple(int(x/4) for x in preview_size)
+preview_center = tuple(int(x/2) for x in preview_size)
+
+watermark_coords = ((preview_center[0] * .25), (preview_center[1]) * .75) # need fix placement
 
 def get_image():
     global image_to_mark
@@ -23,10 +30,26 @@ def get_image():
         image_preview = image_to_mark.copy() # create a copy for thumbnail
         image_preview.thumbnail(preview_size) # use PIL to modify to fit in canvas dimensions
         image_preview = ImageTk.PhotoImage(image_preview) # convert to TK image
-        preview_canvas.create_image(200, 200, image=image_preview) # place image on preview canvas
+        preview_canvas.create_image(preview_center, image=image_preview) # place image on preview canvas
 
 def get_watermark():
-    pass
+    global watermark
+    global watermark_preview
+    file_path = filedialog.askopenfilename(
+        title='Select a Watermark',
+        filetypes=(('JPG', '*.jpg'), ('JPEG', '*.jpeg'), ('PNG', '*.png'), ('GIF', '.gif'))
+    )
+
+    if file_path:
+        print(f'Watermark path obtained: {file_path}')
+
+        # open file, create thumbnail copy and display in preview frame 
+        watermark = Image.open(file_path) # create a PIL image from file
+        watermark_preview = watermark.copy() # create a copy for thumbnail
+        watermark_preview.thumbnail(watermark_preview_size) # set watermark to 25% of preview size
+        watermark_preview.putalpha(128) # set watermark to half transparency
+        watermark_preview = ImageTk.PhotoImage(watermark_preview) # convert to TK image
+        preview_canvas.create_image(watermark_coords, image=watermark_preview) # place image on preview canvas
 
 
 app = Tk()
