@@ -1,22 +1,33 @@
 '''A simple GUI app for watermarking images.'''
-from tkinter import Tk, ttk, Canvas, filedialog
+from tkinter import W, Tk, ttk, Canvas, filedialog, StringVar
 from PIL import Image, ImageTk
 
-image_to_mark = None # to be assigned PhotoImage object
+app = Tk()
+app.title('WaterMarkIt')
+
+# top frame for upload-images buttons and labels
+button_frame = ttk.Frame(app, width=600, height=100)
+button_frame.grid(row=0, column=1, columnspan=3, pady=10)
+
+# watermark variables
+watermark = StringVar() # reference for watermark
+wm_opac = StringVar() # RGB value 0-255
+wm_label = ttk.Label(button_frame, text='WM Opacity').grid(row=0, column=3, padx=10)
+watermark_coords = []
+
+# image variables
+image_to_mark = None # reference for image
+
+# preview variables
 image_preview = None # reference for preview pane image
+preview_size = (600, 400)
 
-watermark = None # to be assigned PhotoImage object
-watermark_preview = None # reference for preview pane watermark
-
-preview_size = (400, 400)
-watermark_preview_size = tuple(int(x/4) for x in preview_size)
-preview_center = tuple(int(x/2) for x in preview_size)
-
-watermark_coords = ((preview_center[0] * .25), (preview_center[1]) * .75) # need fix placement
+# bottom frame for displaying image
+preview_frame = ttk.Frame(app, width=preview_size[0], height=preview_size[1], padding=0, borderwidth=5, relief='sunken')
+preview_frame.grid(row=1, column=1, columnspan=3)
 
 def get_image():
     global image_to_mark
-    global image_preview
     file_path = filedialog.askopenfilename(
         title='Select an Image',
         filetypes=(('JPG', '*.jpg'), ('JPEG', '*.jpeg'), ('PNG', '*.png'), ('GIF', '.gif'))
@@ -27,14 +38,10 @@ def get_image():
 
         # open file, create thumbnail copy and display in preview frame 
         image_to_mark = Image.open(file_path) # create a PIL image from file
-        image_preview = image_to_mark.copy() # create a copy for thumbnail
-        image_preview.thumbnail(preview_size) # use PIL to modify to fit in canvas dimensions
-        image_preview = ImageTk.PhotoImage(image_preview) # convert to TK image
-        preview_canvas.create_image(preview_center, image=image_preview) # place image on preview canvas
+
 
 def get_watermark():
     global watermark
-    global watermark_preview
     file_path = filedialog.askopenfilename(
         title='Select a Watermark',
         filetypes=(('JPG', '*.jpg'), ('JPEG', '*.jpeg'), ('PNG', '*.png'), ('GIF', '.gif'))
@@ -45,34 +52,37 @@ def get_watermark():
 
         # open file, create thumbnail copy and display in preview frame 
         watermark = Image.open(file_path) # create a PIL image from file
-        watermark_preview = watermark.copy() # create a copy for thumbnail
-        watermark_preview.thumbnail(watermark_preview_size) # set watermark to 25% of preview size
-        watermark_preview.putalpha(128) # set watermark to half transparency
-        watermark_preview = ImageTk.PhotoImage(watermark_preview) # convert to TK image
-        preview_canvas.create_image(watermark_coords, image=watermark_preview) # place image on preview canvas
 
+def generate_preview():
+    pass
 
-app = Tk()
-app.title('WaterMarkIt')
+def export_final():
+    pass
 
-# top frame for upload-images buttons and labels
-upload_frame = ttk.Frame(app, width=400, height=100)
-upload_frame.grid(row=0, column=1, columnspan=3, pady=10)
-
-# bottom frame for displaying image
-preview_frame = ttk.Frame(app, width=400, height=400, padding=20, borderwidth=5, relief='sunken')
-preview_frame.grid(row=1, column=1, columnspan=3)
 
 # upload image label and button
-ttk.Label(upload_frame, text='Upload Image:').grid(row=0, column=0)
-ttk.Button(upload_frame, text='Browse', command=get_image).grid(row=0, column=1)
+ttk.Label(button_frame, text='Upload Image:').grid(row=0, column=0)
+ttk.Button(button_frame, text='Browse', command=get_image).grid(row=0, column=1)
 
 # upload watermark label and button
-ttk.Label(upload_frame, text='Upload Watermark:').grid(row=1, column=0, padx=10)
-ttk.Button(upload_frame, text='Browse', command=get_watermark).grid(row=1, column=1)
+ttk.Label(button_frame, text='Upload Watermark:').grid(row=1, column=0, padx=10)
+ttk.Button(button_frame, text='Browse', command=get_watermark).grid(row=1, column=1)
 
-# labels for displaying photo and watermark
-preview_canvas = Canvas(preview_frame, width=400, height=400)
+# watermark scale
+wm_opac_scale = ttk.Scale(button_frame, length=100, from_=0, to=255, variable=wm_opac).grid(row=0, column=4)
+
+# watermark text input
+ttk.Label(button_frame, text='WM Text:').grid(row=1, column=3)
+wm_entry = ttk.Entry(button_frame, textvariable=watermark, width=10).grid(row=1, column=4, padx=10)
+
+# buttons for generating preview/saving final
+ttk.Button(button_frame, text='Generate Preview', command=generate_preview).grid(row=3, column=0, columnspan=2, 
+                                                                                 pady=(10,0))
+ttk.Button(button_frame, text='Export Final', command=export_final).grid(row=3, column=2, columnspan=2, 
+                                                                        pady=(10,0))
+
+# canvas for displaying preview
+preview_canvas = Canvas(preview_frame, width=preview_size[0], height=preview_size[1], background='#4b4b4b')
 preview_canvas.pack(expand=True)
 
 
