@@ -1,5 +1,6 @@
 '''A simple GUI app for watermarking images.'''
 from tkinter import W, Tk, ttk, Canvas, filedialog, StringVar, IntVar
+from tkinter.constants import DISABLED, NORMAL
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 import os
 
@@ -11,7 +12,7 @@ button_frame = ttk.Frame(app, width=600, height=100)
 button_frame.grid(row=0, column=1, columnspan=3, pady=10)
 
 # watermark variables
-watermark_str = StringVar(value='example') # reference for watermark
+watermark_str = StringVar() # reference for watermark
 watermark_img = None
 wm_alpha = IntVar(value=128) # RGB value 0-255
 wm_label = ttk.Label(button_frame, text='WM Opacity').grid(row=0, column=3, padx=10)
@@ -81,6 +82,7 @@ def create_watermark():
 
     watermark_img = watermark
     generate_preview()
+    generate_final_btn.config(state=NORMAL)
 
 
 def generate_preview():
@@ -122,6 +124,13 @@ def export_final():
         if filepath:
             processed_image.save(fp=filepath, format='PNG')
 
+def capture_wm(*args):
+    if watermark_str.get():
+        # wm_generate_btn['state'] = 'normal'
+        wm_generate_btn.config(state=NORMAL)
+    else:
+        wm_generate_btn.config(state=DISABLED)
+
 
 
 # upload image label and button
@@ -130,21 +139,24 @@ ttk.Button(button_frame, text='Browse', command=get_img).grid(row=0, column=1)
 
 # generate watermark label and button
 ttk.Label(button_frame, text='Generate Watermark:').grid(row=1, column=3, padx=10)
-ttk.Button(button_frame, text='Generate', command=create_watermark).grid(row=1, column=4)
+wm_generate_btn = ttk.Button(button_frame, text='Generate', state=DISABLED, command=create_watermark)
+wm_generate_btn.grid(row=1, column=4)
 
 # watermark scale
-wm_alpha_scale = ttk.Scale(button_frame, length=100, from_=0, to=255, variable=wm_alpha).grid(row=0, column=4)
+wm_alpha_scale = ttk.Scale(button_frame, length=100, from_=0, to=255, variable=wm_alpha)
+wm_alpha_scale.grid(row=0, column=4)
 
 # watermark text input
 ttk.Label(button_frame, text='WM Text:').grid(row=1, column=0)
-wm_entry = ttk.Entry(button_frame, textvariable=watermark_str, width=10).grid(row=1, column=1, padx=10)
+wm_entry = ttk.Entry(button_frame, textvariable=watermark_str, width=10)
+wm_entry.grid(row=1, column=1, padx=10)
 
 # buttons for generating preview/saving final
 # ttk.Button(button_frame, text='Update Preview', command=generate_preview).grid(row=3, column=0, columnspan=2, 
 #                                                                                  pady=(10,0))
-ttk.Button(button_frame, text='Export Final', width=20, command=export_final).grid(row=2, column=1, columnspan=3,
-                                                                        pady=(10,0))
+generate_final_btn = ttk.Button(button_frame, text='Export Final', width=20, state=DISABLED, command=export_final)
+generate_final_btn.grid(row=2, column=1, columnspan=3, pady=(10,0))
 
 
-
+watermark_str.trace_add(mode='write', callback=capture_wm)
 app.mainloop()
