@@ -1,5 +1,5 @@
 '''A simple GUI app for watermarking images.'''
-from tkinter import W, Tk, ttk, Canvas, filedialog, StringVar, IntVar, OptionMenu
+from tkinter import Tk, ttk, Canvas, filedialog, StringVar, IntVar, OptionMenu
 from tkinter.constants import DISABLED, NORMAL
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from matplotlib import font_manager
@@ -99,7 +99,6 @@ def create_watermark():
     generate_preview()
     generate_final_btn.config(state=NORMAL)
 
-
 def generate_preview():
     '''Process the watermark and display the updated image on the canvas.'''
     global watermark_img
@@ -126,7 +125,6 @@ def generate_preview():
 
     # display in preview pane
     preview_canvas.create_image(draw_point, image=img_preview)
-
 
 def export_final():
     '''Save final image as png via file dialog.'''
