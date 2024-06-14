@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import IntVar, ttk
+# from typing import Callable, Any
 
 class App(tk.Tk):
     def __init__(self):
@@ -20,7 +21,7 @@ class App(tk.Tk):
         self.user_entry_list = []
 
         # configure window
-        self.title("TypeTest")
+        self.title("FastFingers: A Typing Speed Test")
         self.geometry("700x300")
 
         # label
@@ -33,17 +34,22 @@ class App(tk.Tk):
         # entry
         self.user_entry = ttk.Entry(self, width=400)
         self.user_entry.pack(side="bottom", padx=(10,10), expand=True)
+        self.user_entry.bind('<Return>', self.user_return)
         self.user_entry.focus()
 
-    def user_return(self):
+    def user_return(self, event: tk.Event):
         '''Add entry contents to list of user-entered strings.'''
         self.user_entry_list.append(self.user_entry.get())
         self.user_entry.delete(0, "end")
+        self.user_entry.focus()
+
+        self.update_prompt()
+
 
     def update_prompt(self):
         '''Update display label to the next string in the list.'''
-        self.display_idx += 1
         self.display_label.config(text=self.text_list_1m[self.display_idx])
+        self.display_idx += 1
 
     def calculate_accuracy(self):
         pass
