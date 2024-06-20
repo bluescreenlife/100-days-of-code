@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import IntVar, ttk
+import threading
+import time
 # from typing import Callable, Any
 
 class App(tk.Tk):
@@ -7,7 +9,7 @@ class App(tk.Tk):
         super().__init__()
 
         self.text_start = "Test your typing speed in 1 minute. Press enter at the end of each sentence. Enter \"start\" to begin."
-        self.countdown = IntVar(value=60)
+        self.game_length = IntVar(value=60)
 
         self.display_idx = 0
         self.text_list_1m = ["The quick brown fox jumps over the lazy dog.", 
@@ -19,6 +21,8 @@ class App(tk.Tk):
                             "Keep challenging yourself with different texts to enhance your typing abilities."]
         
         self.user_entry_list = []
+        self.game_on = False
+        self.time_out = False
 
         # configure window
         self.title("FastFingers: A Typing Speed Test")
@@ -28,7 +32,7 @@ class App(tk.Tk):
         self.display_label = ttk.Label(self, text=self.text_start)
         self.display_label.pack(side="top", padx=(10,10), expand=True)
 
-        self.countdown_label = ttk.Label(self, text=float(self.countdown.get()))
+        self.countdown_label = ttk.Label(self, text=float(self.game_length.get()))
         self.countdown_label.pack()
 
         # entry
@@ -38,13 +42,33 @@ class App(tk.Tk):
         self.user_entry.focus()
 
     def user_return(self, event: tk.Event):
-        '''Add entry contents to list of user-entered strings.'''
-        self.user_entry_list.append(self.user_entry.get())
-        self.user_entry.delete(0, "end")
-        self.user_entry.focus()
+        '''Logic flow for appending user's test text depending on game state.'''
+        if not self.game_on and self.user_entry.get().lower().strip() == "start":
+            self.game_on = True
+            timer_thread = threading.Thread(target=self.run_timer)
+            timer_thread.start()
+        elif self.game_on and not self.time_out:
+            self.user_entry_list.append(self.user_entry.get())
+            self.user_entry.delete(0, "end")
+            self.user_entry.focus()
+            self.update_prompt()
+        elif not self.game_on and not self.time_out:
+            self.display_label.config(text="Reminder: type \"start\" to begin.")
+            self.user_entry.delete(0, "end")
+            self.user_entry.focus()
 
-        self.update_prompt()
 
+    def run_timer(self):
+        clock = self.game_length.get()
+        while self.game_on and clock > 0:
+            time.sleep(1)
+            clock -= 1
+            self.countdown_label.config(text=str(clock))
+
+        self.game_on, self.time_out = False, True
+        self.user_entry.config(state="disabled")
+        self.display_label.config(text="Time's Up! Your score: SCORE")
+        
 
     def update_prompt(self):
         '''Update display label to the next string in the list.'''
