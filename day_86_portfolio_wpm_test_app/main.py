@@ -47,16 +47,16 @@ class App(tk.Tk):
             self.game_on = True
             timer_thread = threading.Thread(target=self.run_timer)
             timer_thread.start()
+            self.update_prompt()
         elif self.game_on and not self.time_out:
             self.user_entry_list.append(self.user_entry.get())
-            self.user_entry.delete(0, "end")
-            self.user_entry.focus()
             self.update_prompt()
         elif not self.game_on and not self.time_out:
             self.display_label.config(text="Reminder: type \"start\" to begin.")
             self.user_entry.delete(0, "end")
-            self.user_entry.focus()
 
+        self.user_entry.delete(0, "end")
+        self.user_entry.focus()
 
     def run_timer(self):
         clock = self.game_length.get()
